@@ -2,7 +2,7 @@
 #include "signal_utils.h"
 
 // Use the existing Nano33BleGamepad type alias
-Nano33BleGamepad bleGamepad("Nano 33 BLE Rev2 Gamepad");
+Nano33BleGamepad bleGamepad("nano33BLE Gamepad");
 
 // Built-in LED animation delays when disconnected
 static const int kLedBeaconDelayMilliseconds = 1250;
