@@ -1,0 +1,109 @@
+#include <ArduinoBLE.h>
+#include <USBJoystick.h>
+
+namespace pins {
+  // Onboard LED
+  static const int LED = D13;
+
+  // Directional Pad
+  static const int UP = A4;
+  static const int DOWN = A5;
+  static const int LEFT = A6;
+  static const int RIGHT = A7;
+
+  // Main Buttons
+  static const int A = D4;
+  static const int B = D5;
+  static const int X = D6;
+  static const int Y = D7;
+
+  // Left Joystick
+  static const int JOY_LEFT_X = A0;
+  static const int JOY_LEFT_Y = A1;
+
+  // Right Joystick
+  static const int JOY_RIGHT_X = A2;
+  static const int JOY_RIGHT_Y = A3;
+}
+
+USBJoystick gamepad;
+
+void setup() {
+  pinMode(pins::LED, OUTPUT);
+
+  pinMode(pins::UP, INPUT_PULLUP);
+  pinMode(pins::DOWN, INPUT_PULLUP);
+  pinMode(pins::LEFT, INPUT_PULLUP);
+  pinMode(pins::RIGHT, INPUT_PULLUP);
+
+  pinMode(pins::A, INPUT_PULLUP);
+  pinMode(pins::B, INPUT_PULLUP);
+  pinMode(pins::X, INPUT_PULLUP);
+  pinMode(pins::Y, INPUT_PULLUP);
+
+  pinMode(pins::JOY_LEFT_X, INPUT);
+  pinMode(pins::JOY_LEFT_Y, INPUT);
+
+  pinMode(pins::JOY_RIGHT_X, INPUT);
+  pinMode(pins::JOY_RIGHT_Y, INPUT);
+
+  gamepad.autoSend = false;
+
+  digitalWrite(pins::LED, HIGH);
+  gamepad.wait_ready();
+  digitalWrite(pins::LED, LOW);
+
+  gamepad.setXAxisRange(0, 1023);
+  gamepad.setYAxisRange(0, 1023);
+
+  gamepad.setZAxisRange(0, 1023);
+  gamepad.setRxAxisRange(0, 1023);
+
+  // initialize the Bluetooth® Low Energy hardware
+  if (!BLE.begin()) {
+    Serial.println("starting Bluetooth® Low Energy module failed!");
+
+    while (1);
+  }
+
+  Serial.println("Bluetooth® Low Energy Central");
+
+  // start scanning for peripheral
+  BLE.scan();
+}
+
+void loop() {
+  bool valUp = !digitalRead(pins::UP);
+  bool valDown = !digitalRead(pins::DOWN);
+  bool valLeft = !digitalRead(pins::LEFT);
+  bool valRight = !digitalRead(pins::RIGHT);
+
+  bool valA = !digitalRead(pins::A);
+  bool valB = !digitalRead(pins::B);
+  bool valX = !digitalRead(pins::X);
+  bool valY = !digitalRead(pins::Y);
+
+  int valJoyLeftX = analogRead(pins::JOY_LEFT_X);
+  int valJoyLeftY = analogRead(pins::JOY_LEFT_Y);
+
+  int valJoyRightX = analogRead(pins::JOY_RIGHT_X);
+  int valJoyRightY = analogRead(pins::JOY_RIGHT_Y);
+
+  gamepad.setButton(0, valUp);
+  gamepad.setButton(1, valDown);
+  gamepad.setButton(2, valLeft);
+  gamepad.setButton(3, valRight);
+
+  gamepad.setButton(4, valA);
+  gamepad.setButton(5, valB);
+  gamepad.setButton(6, valX);
+  gamepad.setButton(7, valY);
+
+  gamepad.setXAxis(valJoyLeftX);
+  gamepad.setYAxis(valJoyLeftY);
+
+  gamepad.setZAxis(valJoyRightX);
+  gamepad.setRxAxis(valJoyRightY);
+
+  gamepad.update();
+}
